@@ -20,7 +20,7 @@ class Main:
                 if os.path.isfile(sys.argv[1]):
                         configuration = Config(sys.argv[1])
                         server = Server(configuration)
-                        server.run(port=configuration.getPort())
+                        server.run(port=configuration.getPort(), host="0.0.0.0")
                 else:
                     with open(sys.argv[1], 'w') as f:
                         f.write(json.dumps({"server_url": "https://vyuka.gyarab.cz", "port": 8080}, indent=4))

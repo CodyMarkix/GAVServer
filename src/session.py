@@ -2,6 +2,7 @@ import seleniumrequests as selenreq
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 import base64
 
 import shutil, time, random
@@ -20,7 +21,10 @@ class Session:
 
         # Initialize Firefox driver
         service = Service(geckodriver_path)
-        self.browser = selenreq.Firefox(service=service)
+        options = Options()
+        options.headless = True
+
+        self.browser = selenreq.Firefox(service=service, options=options)
         self.serverURL = self.config.getServerURL()
 
         self.logged_in_page = self.login()
