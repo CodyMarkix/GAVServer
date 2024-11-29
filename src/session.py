@@ -21,9 +21,8 @@ class Session:
 
         # Initialize Firefox driver
         service = Service(geckodriver_path)
-        
+
         options = Options()
-        options.headless = True
         options.binary_location = config.getFirefoxBinary()
 
         self.browser = selenreq.Firefox(service=service, options=options)
@@ -34,31 +33,36 @@ class Session:
     def __str__(self):
         return f"Mail: {self.__mail}; Password: {base64.b64encode(self.__password.encode()).decode()}"
 
+    def calculateGoogleDelay(self, base_delay: int, offset: float) -> float:
+        base_delay_float = float(base_delay)
+        return random.uniform(base_delay_float - offset, base_delay_float + offset)
+
     def login(self):
         creds = (self.__mail, self.__password)
-        
+        delays = self.config.getDelays()
+
         # Navigating the server website
         self.browser.get(self.serverURL)
         self.browser.find_element(By.ID, 'j_idt21:login').send_keys(Keys.ENTER)
-        time.sleep(0.7)
+        time.sleep(delays[0])
 
         self.browser.find_element(By.TAG_NAME, 'button').send_keys(Keys.ENTER)
-        time.sleep(0.7)
+        time.sleep(delays[0])
 
         #------------------------
         # GOOGLE AUTHENTICATION
         #------------------------
         email_field = self.browser.find_element(By.ID, 'identifierId')
         email_field.send_keys(creds[0])
-        time.sleep(random.uniform(1.75, 2.15)) # We have to be a lot more careful as to not trip up any bot detection Google might have
+        time.sleep(self.calculateGoogleDelay(delays[1], delays[2])) # We have to be a lot more careful as to not trip up any bot detection Google might have
         email_field.send_keys(Keys.ENTER)
-        time.sleep(random.uniform(2.75, 3.15))
+        time.sleep(self.calculateGoogleDelay(delays[1], delays[2]))
 
         pass_field = self.browser.find_element(By.NAME, 'Passwd')
         pass_field.send_keys(creds[1])
-        time.sleep(random.uniform(2.75, 3.15))
+        time.sleep(self.calculateGoogleDelay(delays[1], delays[2]) + 1)
         pass_field.send_keys(Keys.ENTER)
-        time.sleep(random.uniform(3, 5))
+        time.sleep(self.calculateGoogleDelay(delays[1], delays[2]) + 1.75)
 
         # Returning the signed in homepage
         logged_in_homepage = self.browser.page_source
