@@ -21,8 +21,10 @@ class Session:
 
         # Initialize Firefox driver
         service = Service(geckodriver_path)
+        
         options = Options()
         options.headless = True
+        options.binary_location = config.getFirefoxBinary()
 
         self.browser = selenreq.Firefox(service=service, options=options)
         self.serverURL = self.config.getServerURL()
