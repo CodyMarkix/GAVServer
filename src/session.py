@@ -29,7 +29,7 @@ class Session:
         return f"Mail: {self.__mail}; Password: {base64.b64encode(self.__password.encode()).decode()}"
 
     def login(self):
-        creds = self.config.getUserCredentials()
+        creds = (self.__mail, self.__password)
         
         # Navigating the server website
         self.browser.get(self.serverURL)
