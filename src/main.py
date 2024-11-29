@@ -23,8 +23,8 @@ class Main:
                         server.run(port=configuration.getPort())
                 else:
                     with open(sys.argv[1], 'w') as f:
-                        f.write(json.dumps({"server_url": "https://vyuka.gyarab.cz", "login_email": "", "login_pass": ""}, indent=4))
-                    print("Config file created! Please fill out your credentials.")
+                        f.write(json.dumps({"server_url": "https://vyuka.gyarab.cz", "port": 8080}, indent=4))
+                    print("Config file created!")
                     sys.exit(0)
             else:
                 raise FileNotFoundError()
