@@ -9,27 +9,37 @@ class Server(Flask):
         super().__init__(__name__)
         self.sm = SessionManager(config)
 
-        self.add_url_rule('/auth', view_func=self.viewLogin)
+        self.add_url_rule('/auth', view_func=self.viewLogin, methods=['POST'])
         self.add_url_rule('/user/fullName', view_func=self.getUserFullName)
         self.add_url_rule('/user/class', view_func=self.getUserClass)
         self.add_url_rule('/seminars', view_func=self.getSeminars)
         self.add_url_rule('/programming', view_func=self.getProgrammingAssignments)
-
+    
     def viewLogin(self):
-        args = request.args
-        sess = self.sm.addSession(args['email'], args['password'])
+        if request.method == "POST":
+            args = request.args
+            
+            for entry in self.sm.getAllSessions():
+                for session in entry.values():
+                    if args['email'] == session.mail:
+                        return {
+                            "message": "Already authenticated!",
+                            "sessionID": session.id
+                        }
 
-        return {
-            "message": "Authenticated successfuly!",
-            "sessionID": sess[0],
-            "timeToWait": sess[1]
-        }
+            sess = self.sm.addSession(args['email'], args['password'])
+
+            return {
+                "message": "Authenticated successfuly!",
+                "sessionID": sess[0]
+            }
+        else:
+            return self.returnNonTwoHunderdCode(405)
 
     def getUserFullName(self):
         if request.args['id']:
             sess = self.sm.getSessionByID(int(request.args['id']))
             name = sess.getUserFullName()
-            print(name, len(name))
             
             if len(name) == 2:
                 return {
@@ -103,6 +113,14 @@ class Server(Flask):
                     "message_cz": "Nemáte povolen přístup k těmto datům.",
                     "date": datetime.now()
                 }, 403
+            
+            case 405:
+                return {
+                    "code": "405 Forbidden",
+                    "message": "Wrong request method",
+                    "message_cz": "Špatná metoda žádosti",
+                    "date": datetime.now()
+                }
             
             case 500:
                 return {

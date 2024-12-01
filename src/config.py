@@ -2,6 +2,8 @@ import json
 
 class Config():
     def __init__(self, configPath):
+        self.configPath = configPath
+        
         with open(configPath, 'r') as f:
             self.__data = json.loads(f.read())
         

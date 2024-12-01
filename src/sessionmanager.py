@@ -2,6 +2,8 @@ import math
 from session import Session
 from config import Config
 import random
+from datetime import datetime
+import time
 
 class SessionManager:
     # Funny little note here:
@@ -13,14 +15,17 @@ class SessionManager:
     def __init__(self, config: Config) -> None:
         self.config = config
 
-    def addSession(self, mail, password):
-        id = random.randint(1000, 2147483647)
-        self.__sessionList.append({f"{id}": Session(self.config, mail, password)})
+    def addSession(self, mail: str, password: str, cookies: None|dict=None, local_storage: None|dict=None, session_storage: None|dict=None, existing_id: None|int = None):
+        if existing_id == None:
+            id = random.randint(1000, 2147483647)
+        else:
+            id = existing_id
+
+        self.__sessionList.append({f"{id}": Session(self.config, mail, password, id, cookies, local_storage, session_storage)})
 
         return id, 16
     
-    def getAllSessions(self):
-        """ DEPRECATED: Was originally for debugging purposes, is now a security nightmare"""
+    def getAllSessions(self) -> list[dict[str, Session]]:
         return self.__sessionList
     
     def getSessionByID(self, id: int) -> Session | None:

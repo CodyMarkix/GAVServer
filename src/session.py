@@ -7,7 +7,7 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 
-import base64
+import subprocess
 from datetime import datetime
 import shutil, time, random, os
 
@@ -16,11 +16,12 @@ from config import Config
 DEBUG_MODE=True
 
 class Session:
-    def __init__(self, config: Config, mail: str, password: str):
+    def __init__(self, config: Config, mail: str, password: str, id: int, cookies=None, local_storage=None, session_storage=None):
         self.config = config
-        self.__mail = mail
+        self.mail = mail
         self.__password = password
-
+        self.id = id
+        
         if not DEBUG_MODE:
             os.environ['MOZ_HEADLESS'] = 1
 
@@ -29,18 +30,35 @@ class Session:
             geckodriver_path = ""
 
         # Initialize Firefox driver
-        service = Service(geckodriver_path)
+        self.gecko_service = Service(geckodriver_path, popen_kw={"creation_flags": subprocess.CREATE_NEW_PROCESS_GROUP})
 
-        options = Options()
-        options.binary_location = config.getFirefoxBinary()
+        self.browser_options = Options()
+        self.browser_options.binary_location = config.getFirefoxBinary()
 
-        self.browser = selenreq.Firefox(service=service, options=options)
-        self.serverURL = self.config.getServerURL()
+        self.browser = selenreq.Firefox(service=self.gecko_service, options=self.browser_options)
+        
+        if all([cookies != None, local_storage != None, session_storage != None]):
+            self.serverURL = self.config.getServerURL()
+            self.browser.get(self.serverURL + "/index.xhtml")
+            
+            # Resuming a session if necessary
+            self.browser.delete_all_cookies()
+            for cookie in cookies:
+                self.browser.add_cookie(cookie)
 
-        self.logged_in_page = self.login()
+            for key, value in local_storage.items():
+                self.browser.execute_script(f"window.localStorage.setItem('{key}', '{value}');")
+
+            for key, value in session_storage.items():
+                self.browser.execute_script(f"window.sessionStorage.setItem('{key}', '{value}');")
+
+            self.browser.refresh()
+        else:
+            self.serverURL = self.config.getServerURL()
+            self.logged_in_page = self.login()
 
     def __str__(self):
-        return f"Mail: {self.__mail}; Password: {base64.b64encode(self.__password.encode()).decode()}"
+        return f"Mail: {self.mail}; Password: [REDACTED]"
     
     @staticmethod
     def getCurrentSemester(academic_year: str): # https://chatgpt.com/share/674c1ea5-1cac-8003-bf74-bff0b104960b
@@ -84,7 +102,7 @@ class Session:
             return ""
 
     def login(self):
-        creds = (self.__mail, self.__password)
+        creds = (self.mail, self.__password)
         delays = self.config.getDelays()
 
         # Navigating the server website
