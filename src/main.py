@@ -28,6 +28,7 @@ class Main:
                             "bind_address": "0.0.0.0",
                             "port": 8080,
                             "firefox_binary": "C:\\Program Files\\Mozilla Firefox\\firefox.exe" if os.name == 'nt' else "/usr/bin/firefox",
+                            "headless_mode": True,
                             "time_delay_gyarab": 0.7,
                             "time_delay_google": 2,
                             "time_offset_google": 0.25
