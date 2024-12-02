@@ -34,7 +34,7 @@ class Session:
             geckodriver_path = ""
 
         # Initialize Firefox driver
-        self.gecko_service = Service(geckodriver_path, popen_kw={"creation_flags": subprocess.CREATE_NEW_PROCESS_GROUP})
+        self.gecko_service = Service(geckodriver_path, popen_kw={"creation_flags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {})
 
         self.browser_options = Options()
         self.browser_options.binary_location = config.getFirefoxBinary()
