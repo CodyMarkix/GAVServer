@@ -13,7 +13,10 @@
             "console": "integratedTerminal",
             "args": [
                 "..\\config.json"
-            ]
+            ],
+            "env": {
+                "GAV_DEBUG_MODE": "true"
+            }
         }
     ]
 }

@@ -8,12 +8,10 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 
 import subprocess
-from datetime import datetime
+from datetime import datetime, timedelta
 import shutil, time, random, os
 
 from config import Config
-
-DEBUG_MODE=True
 
 class Session:
     def __init__(self, config: Config, mail: str, password: str, id: int, cookies=None, local_storage=None, session_storage=None):
@@ -21,9 +19,15 @@ class Session:
         self.mail = mail
         self.__password = password
         self.id = id
-        
-        if not DEBUG_MODE:
-            os.environ['MOZ_HEADLESS'] = 1
+        # TODO: Make sure that you can do simultaneous requests
+
+        if "GAV_DEBUG_MODE" in os.environ.keys():
+            if os.environ['GAV_DEBUG_MODE'] != "true":
+                os.environ['MOZ_HEADLESS'] = "1"
+        elif self.config.getHeadlessMode():
+            os.environ['MOZ_HEADLESS'] = "1"
+        else:
+            os.environ['MOZ_HEADLESS'] = "0"
 
         geckodriver_path = shutil.which('geckodriver')
         if geckodriver_path == None:
@@ -139,9 +143,6 @@ class Session:
         time.sleep(self.config.getDelays()[0])
 
         fullNameDiv = self.browser.find_element(By.CLASS_NAME, 'title_text_right')
-
-        with open('debug.html', 'w', encoding='utf-8') as f:
-            f.write(self.browser.page_source)
         
         # sanitize the results of any encoding fuckers
         # what the fuck kinda encoding is selenium using that results in correct but incorrectly capitalized characters
@@ -202,7 +203,7 @@ class Session:
                 case 5:
                     return "F"
     
-    def processProgrammingExcercise(self, row: WebElement) -> dict:
+    def processProgrammingAssignment(self, row: WebElement) -> dict:
         assignment = {}
         data = row.find_elements(By.TAG_NAME, 'td')
         i = 0
@@ -251,7 +252,7 @@ class Session:
 
         return assignment
 
-    def getProgrammingExcercises(self, index: int) -> list:
+    def getProgrammingAssignments(self, index: int) -> list:
         school_branch = self.getClass()[-1]
         delays = self.config.getDelays()
 
@@ -263,10 +264,50 @@ class Session:
             table_rows = table[0].find_elements(By.TAG_NAME, 'tbody')
 
             for row in table_rows:
-                print(f"Row: {table_rows.index(row)}", end=' ')
-                assignment_data = self.processProgrammingExcercise(row.find_element(By.TAG_NAME, 'tr'))
+                assignment_data = self.processProgrammingAssignment(row.find_element(By.TAG_NAME, 'tr'))
+
+                # While we're here, let's add these assignments to the cache
+                # self.programmingAssignmentCache.append({
+                #     "id": assignment_data['id'],
+                #     "assignment": assignment_data,
+                #     "expires_on": (datetime.now() + timedelta(days=7)).isoformat()
+                # })
+
                 assignments.append(assignment_data)
 
             return assignments
         else:
             return ["wrong branch!"]
+        
+    def getProgrammingAssignment(self, name: str) -> dict:
+        semester = Session.getCurrentSemester(Session.getSchoolYearByTime())
+        assignments = self.getProgrammingAssignments(semester)
+
+        for assign in assignments:
+            if assign['name'] == name:
+                return assign
+            
+        return {}
+            
+    def getProgrammingTotalGrade(self, index: int) -> dict:
+        self.browser.get(self.serverURL + f"/kahoun/student/index.php?period={index}")
+        table = self.browser.find_element(By.TAG_NAME, 'table')
+        total_row = table.find_element(By.TAG_NAME, 'tfoot').find_element(By.TAG_NAME, 'tr').find_elements(By.TAG_NAME, 'th')
+        data = {}
+
+        i = 0
+        while i < len(total_row):
+            if i == 1:
+                data.update({"total_available_points": total_row[i].find_element(By.TAG_NAME, 'span').text})
+            
+            if i == 3:
+                text = total_row[i].find_element(By.TAG_NAME, 'span').find_element(By.TAG_NAME, 'span').text
+                data.update({
+                    "total_gotten_points": text.split()[0],
+                    "average_percentage": text.split()[1],
+                    "final_grade": text.split()[2]
+                })
+
+            i += 1
+
+        return data
