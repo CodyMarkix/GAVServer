@@ -253,6 +253,7 @@ class Session:
         return assignment
 
     def getProgrammingAssignments(self, index: int) -> list:
+        # BUG: All grading is reported as the first assignment's grading
         school_branch = self.getClass()[-1]
         delays = self.config.getDelays()
 
@@ -265,14 +266,6 @@ class Session:
 
             for row in table_rows:
                 assignment_data = self.processProgrammingAssignment(row.find_element(By.TAG_NAME, 'tr'))
-
-                # While we're here, let's add these assignments to the cache
-                # self.programmingAssignmentCache.append({
-                #     "id": assignment_data['id'],
-                #     "assignment": assignment_data,
-                #     "expires_on": (datetime.now() + timedelta(days=7)).isoformat()
-                # })
-
                 assignments.append(assignment_data)
 
             return assignments
@@ -280,6 +273,7 @@ class Session:
             return ["wrong branch!"]
         
     def getProgrammingAssignment(self, name: str) -> dict:
+        # BUG: Fetching single programming sometimes doesn't return anything
         semester = Session.getCurrentSemester(Session.getSchoolYearByTime())
         assignments = self.getProgrammingAssignments(semester)
 
