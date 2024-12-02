@@ -1,3 +1,4 @@
 Flask==3.1.0
 selenium==4.27.1
 selenium-requests==2.0.4
+flasgger==0.9.7.1

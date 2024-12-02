@@ -36,3 +36,9 @@ class Config():
         OPTION: Delays for the webdriver between actions
         """
         return self.__data['time_delay_gyarab'], self.__data['time_delay_google'], self.__data['time_offset_google']
+    
+    def getSwaggerInfo(self) -> dict:
+        """
+        OPTION: Info data for Swagger docs
+        """
+        return self.__data['swagger_info']
