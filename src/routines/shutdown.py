@@ -15,8 +15,7 @@ class Shutdown:
         for entry in session_list:
             for session in entry.values():
                 browser: Firefox = session.browser
-                if sys.argv[0][-3:] == ".py":
-                    os.chdir("..")
+                os.chdir("..")
 
                 if not os.path.isdir(os.path.join(".", "sessions")):
                     os.mkdir("sessions")

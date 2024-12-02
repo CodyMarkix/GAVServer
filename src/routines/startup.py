@@ -15,7 +15,7 @@ class Startup:
         pass
 
     def resumeSavedSessions(self, sm):
-        sessions_dir = os.path.join(".." if sys.argv[0][-3:] == ".py" else ".", "sessions")
+        sessions_dir = os.path.join("..", "sessions")
 
         if os.path.exists(sessions_dir):
             if len(os.listdir(sessions_dir)) > 0:
@@ -49,41 +49,63 @@ class Startup:
             webbrowser.open_new_tab("https://pypi.org/project/selenium/#description")
             sys.exit(2)
 
-        if len(sys.argv) > 1:
-            try:
-                if sys.argv[1][-4:] == "json":
-                    self.conditions['configFileArgumentGiven'] = True
-                    
-                    if os.path.isfile(sys.argv[1]):
-                        with open(sys.argv[1], 'r') as f:
-                            json.loads(f.read())
-                        self.conditions['configFilePresent'] = True
-                    else:
-                        raise Exception()
-                        
-
-                else:
-                    print("FATAL: Not a json file")
-                    sys.exit(2)
-            except Exception:
-                f.close()
-                with open(sys.argv[1], 'w') as new_f:
-                    new_f.write(json.dumps({
-                            "server_url": "https://vyuka.gyarab.cz",
-                            "bind_address": "0.0.0.0",
-                            "port": 8080,
-                            "firefox_binary": "C:\\Program Files\\Mozilla Firefox\\firefox.exe" if os.name == 'nt' else "/usr/bin/firefox",
-                            "headless_mode": True,
-                            "time_delay_gyarab": 0.7,
-                            "time_delay_google": 2,
-                            "time_offset_google": 0.25
-                        }, indent=4))
-                    print("Config file created! Please check the file to ensure the values are set as you want them.")
-                    sys.exit(0)
-        else:
-            print("FATAL: Please provide a config file")
-            sys.exit(2)
-            
+        try:
+            with open(os.path.join("..", "config.json"), 'r') as f:
+                json.loads(f.read())
+                self.conditions['configFileArgumentGiven'] = True  
+                self.conditions['configFilePresent'] = True
+        except Exception:
+            f.close()
+            with open(os.path.join("..", "config.json"), 'w') as new_f:
+                new_f.write(json.dumps({
+                    "server_url": "https://vyuka.gyarab.cz",
+                    "bind_address": "127.0.0.1",
+                    "port": 8054,
+                    "firefox_binary": "C:\\Program Files\\Mozilla Firefox\\firefox.exe" if os.name == 'nt' else "/usr/bin/firefox",
+                    "headless_mode": True,
+                    "time_delay_gyarab": 0.7,
+                    "time_delay_google": 2,
+                    "time_offset_google": 0.25,
+                    "swagger_info": {
+                        "swagger": "2.0",
+                        "info": {
+                            "title": "GAV Server",
+                            "description": "API for https://vyuka.gyarab.cz",
+                            "contact": {
+                                "name": "Your contact",
+                                "url": "https://your.contact.com"
+                            },
+                            "license": {
+                                "name": "GNU GPLv3",
+                                "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
+                            },
+                            "version": "v1"
+                        },
+                        "host": "127.0.0.1",
+                        "basePath": "/",
+                        "schemes": ["http", "https"],
+                        "produces": ["application/json"]
+                    },
+                    "swagger_config": {
+                        "headers": [
+                        ],
+                        "specs": [
+                            {
+                                "endpoint": "apispec_1",
+                                "route": "/apispec_1.json",
+                                "rule_filter": True,
+                                "model_filter": True
+                            }
+                        ],
+                        "specs_route": "/",
+                        "ui_params": {
+                            "supportedSubmitMethods": []
+                        }
+                    }
+                }, indent=4))
+                print("Config file created! Please check the file to ensure the values are set as you want them.")
+                sys.exit(0)
+        
 
     def checkConditions(self) -> bool:
         num_of_trues = 0
