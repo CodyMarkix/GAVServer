@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import signal, sys
+import signal
+import sys
 
 from config import Config
 from server import Server
@@ -21,7 +22,8 @@ class Main:
 
             st.resumeSavedSessions(server.sm)
             try:
-                server.run(port=configuration.getIPPort()[1], host=configuration.getIPPort()[0])
+                if __name__ == "__main__":
+                    server.run(port=configuration.getIPPort()[1], host=configuration.getIPPort()[0])
             except KeyboardInterrupt:
                 sh.performShutdown() # try/except works as a fallback
                 sys.exit(1)
@@ -29,6 +31,4 @@ class Main:
             print("FATAL: Unhandled exception, bailing out!")
             sys.exit(127)
 
-
-if __name__ == "__main__":
-    Main.main()
+Main.main()
