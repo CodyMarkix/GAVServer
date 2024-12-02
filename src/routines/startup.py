@@ -34,7 +34,7 @@ class Startup:
                     with open(os.path.join(".", 'MANIFEST.json'), 'r') as manifest_file:
                         manifest = json.loads(manifest_file.read())
 
-                    sm.addSession(manifest['mail'], "[REDACTED]", cookies, local_storage, session_storage)
+                    sm.addSession(manifest['mail'], "[REDACTED]", cookies, local_storage, session_storage, manifest['id'])
 
                     os.chdir("..")
             else:
