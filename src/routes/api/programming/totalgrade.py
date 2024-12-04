@@ -6,31 +6,35 @@ class TotalGrade(Resource):
     def __init__(self, **kwargs):
         self.sm = kwargs['session_manager']
     
+    @swag_from({
+        "description": "Gets the total grade for programming. Includes total points, average percentage and grade.",
+        "operationId": "getProgrammingTotalGrade",
+        "tags": ["Programming"],
+        "parameters": [
+            {
+                "allowEmptyValue": False,
+                "description": "Session ID",
+                "in": "query",
+                "name": "id",
+                "required": True,
+                "type": "integer"
+            },
+            {
+                "allowEmptyValue": True,
+                "description": "Mainly for the demos on this doc page",
+                "in": "header",
+                "name": "ngrok-skip-browser-warning",
+                "required": "false"
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Got the total grade for programming."
+            }
+        },
+        "summary": "Gets the total grade"
+    })
     def get(self):
-        """
-        Gets the total grade
-
-        ---
-        tags:
-          - Programming
-        description: Gets the total grade for programming. Includes total points, average percentage and grade.
-        operationId: getProgrammingTotalGrade
-        parameters:
-          - name: id
-            in: query
-            description: Session ID
-            required: true
-            type: integer
-            allowEmptyValue: false
-          - name: ngrok-skip-browser-warning
-            in: header
-            description: Mainly for the demos on this doc page
-            required: false
-            allowEmptyValue: true
-        responses:
-          200:
-            description: Got the total grade for programming.
-        """
         if request.args['id']:
             sess = self.sm.getSessionByID(int(request.args['id']))
             total_grade = sess.getProgrammingTotalGrade(sess.getCurrentSemester(sess.getSchoolYearByTime()))

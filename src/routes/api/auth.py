@@ -7,8 +7,9 @@ class Auth(Resource):
         self.sm = kwargs['session_manager']
 
     @swag_from({
-        "description": "<br/>",
+        "description": "Logs the user into Gyarab Výuka, currently done via e-mail and password. This will most likely have to be re-done as there is a reason we all use OAuth2 now. <b>Currently doesn't support 2FA</b>",
         "operationId": "login",
+        "tags": ["Authentication"],
         "parameters": [
           {
             "allowEmptyValue": False,

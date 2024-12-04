@@ -7,8 +7,9 @@ class Seminars(Resource):
         self.sm = kwargs['session_manager']
     
     @swag_from({
-        "description": "<br/>",
+        "description": "Gets seminars the user is enrolled in.",
         "operationId": "getSeminars",
+        "tags": ["Seminars"],
         "parameters": [
           {
             "allowEmptyValue": False,

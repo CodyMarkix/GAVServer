@@ -7,8 +7,9 @@ class UserClass(Resource):
         self.sm = kwargs['session_manager']
 
     @swag_from({
-        "description": "<br/>",
+        "description": "Gets the class the user is currently attending.",
         "operationId": "getUserClass",
+        "tags": ["User info"],
         "parameters": [
           {
             "allowEmptyValue": False,

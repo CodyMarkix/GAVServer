@@ -7,8 +7,9 @@ class FullName(Resource):
         self.sm = kwargs['session_manager']
 
     @swag_from({
-        "description": "<br/>",
+        "description": "Gets the user's full name, including any middle names in an array.",
         "operationId": "getUserFullName",
+        "tags": ["User info"],
         "parameters": [
           {
             "allowEmptyValue": False,

@@ -7,8 +7,9 @@ class SingleProgrammingAssignment(Resource):
         self.sm = kwargs['session_manager']
     
     @swag_from({
-        "description": "<br/>",
+        "description": "Gets a specific assignment from this school quarter.",
         "operationId": "getProgrammingAssignment",
+        "tags": ["Programming"],
         "parameters": [
           {
             "allowEmptyValue": False,
