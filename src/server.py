@@ -39,15 +39,25 @@ class Server(Flask):
         self.api.add_resource(TotalGrade, '/api/programming/totalGrade', resource_class_kwargs={"session_manager": self.sm})
 
     def beforeRequest(self):
-        if re.match(r"/api/(?!auth|docs|flasgger_static).*", request.path): # https://regex101.com/r/kErJo7/1
+        if request.path == "/api/auth":
+            if not all(["email" in request.args.keys(), "password" in request.args.keys()]):
+                return self.returnNonTwoHunderdCode(400)
+        
+        elif "/flasgger_static/" in request.path:
+            print("Accessing API docs")
+        
+        elif "/apidocs" in request.path:
+            print("Accessing API docs")
+
+        elif "/" in request.path:
+            print("Accessing API docs")
+
+        else:
             if "id" in request.args.keys():
-                if not self.sm.getSessionByID(request.args['id']):
+                if not self.sm.getSessionByID(int(request.args['id'])):
                     return self.returnNonTwoHunderdCode(401)
             else:
                 return self.returnNonTwoHunderdCode(401)
-        else:
-            if not all(["email" in request.args.keys(), "password" in request.args.keys()]):
-                return self.returnNonTwoHunderdCode(400)
 
     def returnNonTwoHunderdCode(self, res_code: int) -> tuple[dict, int]:
         match res_code:
