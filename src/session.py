@@ -235,25 +235,27 @@ class Session:
                 assignment.update({"date_completed": data[i].find_element(By.TAG_NAME, 'span').text})
 
             elif i == 6:
-                a_tag = data[i].find_element(By.XPATH, '//*[@title="zobrazí podrobné výsledky úlohy"]')
-                grade_data = a_tag.find_element(By.TAG_NAME, 'span').text.split(" ")
+                try:
+                    a_tag = data[i].find_element(By.TAG_NAME, 'a')
+                    grade_data = a_tag.find_element(By.TAG_NAME, 'span').text.split(" ")
 
-                assignment.update({"grading": {
-                    "total_points": grade_data[0],
-                    "percentage": grade_data[1],
-                    "final_mark": {
-                        "cz": int(grade_data[2]),
-                        "en": self.convertGrades(int(grade_data[2]))
-                    }
-                }})
-                time.sleep(0.1)
+                    assignment.update({"grading": {
+                        "total_points": grade_data[0],
+                        "percentage": grade_data[1],
+                        "final_mark": {
+                            "cz": int(grade_data[2]),
+                            "en": self.convertGrades(int(grade_data[2]))
+                        }
+                    }})
+                except NoSuchElementException:
+                    assignment.update({"grading": None})
+
 
             i += 1
 
         return assignment
 
     def getProgrammingAssignments(self, index: int) -> list:
-        # BUG: All grading is reported as the first assignment's grading
         school_branch = self.getClass()[-1]
         delays = self.config.getDelays()
 
