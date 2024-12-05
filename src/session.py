@@ -6,10 +6,12 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException
 
 import subprocess
 from datetime import datetime, timedelta
 import shutil, time, random, os
+import base64
 
 from config import Config
 
@@ -27,7 +29,7 @@ class Session:
         elif self.config.getHeadlessMode():
             os.environ['MOZ_HEADLESS'] = "1"
         else:
-            os.environ['MOZ_HEADLESS'] = "0"
+            print("Geckodriver running in head mode!")
 
         geckodriver_path = shutil.which('geckodriver')
         if geckodriver_path == None:
@@ -132,11 +134,16 @@ class Session:
         pass_field.send_keys(Keys.ENTER)
         time.sleep(self.calculateGoogleDelay(delays[1], delays[2]) + 1.75)
 
-        # Returning the signed in homepage
-        logged_in_homepage = self.browser.page_source
-        time.sleep(0.5)
+        # Going to Google My Account, we're gonna quickly scrape the avatar
+        self.browser.get("https://myaccount.google.com")
+        time.sleep(delays[1] + 2)
 
-        return logged_in_homepage
+        # God I love web scraping so so much
+        avatar_url = self.browser.find_element(By.CLASS_NAME, 'pGxpHc').find_element(By.TAG_NAME, 'header').find_element(By.CLASS_NAME, 'gb_kd gb_od gb_Fd').find_element(By.CLASS_NAME, 'gb_Bd gb_Zd gb_wd gb_Jd').find_element(By.CLASS_NAME, 'gb_Re').find_element(By.CLASS_NAME, 'gb_y gb_bd gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_C gb_ib gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_A gb_Xa gb_Z').find_element(By.CLASS_NAME, 'gb_O gbii').get_attribute('src')
+        self.avatar = base64.b64encode(self.browser.request('GET', avatar_url).content)
+
+        self.browser.get(self.serverURL)
+        time.sleep(0.5)
     
     def getUserFullName(self) -> list[str]:
         self.browser.get(self.serverURL + "/index.xhtml")
@@ -152,6 +159,16 @@ class Session:
             result_sanitized.append(x.capitalize())
 
         return result_sanitized
+    
+    def getUserGoogleAvatar(self) -> bytes:
+        google_url = "https://myaccount.google.com"
+        self.browser.get(google_url)
+        time.sleep(self.config.getDelays()[1] + 3)
+
+        acc_change_element = self.browser.find_element(By.CLASS_NAME, 'gb_A gb_Xa gb_Z')
+        image_element = acc_change_element.find_element(By.TAG_NAME, 'img')
+        
+        return self.browser.request('GET', image_element.get_attribute('src')).content
     
     def getClass(self) -> str:
         self.browser.get(self.serverURL + "/index.xhtml")
@@ -204,13 +221,13 @@ class Session:
                     return "F"
     
     def processProgrammingAssignment(self, row: WebElement) -> dict:
+        # FIXME: Handle unaccepted assignments and voluntary ones
         assignment = {}
         data = row.find_elements(By.TAG_NAME, 'td')
         i = 0
 
         while i < len(data):
             if i == 0:
-                print(f"Column: {i}")
                 try:
                     values = data[i].find_element(By.TAG_NAME, 'a').text.split(": ")
                 except NoSuchElementException:
@@ -223,16 +240,53 @@ class Session:
                 assignment.update({"points": data[i].find_element(By.TAG_NAME, 'span').text})
             
             elif i == 2:
-                assignment.update({"date_accepted": data[i].find_element(By.TAG_NAME, 'span').text})
+                try:
+                    value = data[i].find_element(By.TAG_NAME, 'span')
+                    assignment.update({
+                        "accepted": True,
+                        "date_accepted": value.text
+                    })
+                except NoSuchElementException:
+                    accept_link = data[i].find_element(By.TAG_NAME, 'a')
+                    assignment.update({
+                        "accepted": False,
+                        "date_accepted": None,
+                        "accept_link": accept_link.get_attribute('href')
+                    })
             
             elif i == 3:
-                assignment.update({"date_begun": data[i].find_element(By.TAG_NAME, 'span').text})
-
+                if data[i].text == "dobrovolné":
+                    assignment.update({
+                        "has_begun": False,
+                        "date_begun": None,
+                        "voluntary": True
+                    })
+                
+                elif data[i].text == "nezahájeno":
+                    assignment.update({
+                        "has_begun": False,
+                        "voluntary": False
+                    })
+                
+                else:
+                    value = data[i].find_element(By.TAG_NAME, 'span').text
+                    assignment.update({
+                        "has_begun": True,
+                        "date_begun": value,
+                        "voluntary": False
+                    })
             elif i == 4:
-                assignment.update({"date_submitted": data[i].find_element(By.TAG_NAME, 'span').text})
-
+                try:
+                    value = data[i].find_element(By.TAG_NAME, 'span').text
+                    assignment.update({"date_returned": value})
+                except NoSuchElementException:
+                    assignment.update({"date_returned": None})
             elif i == 5:
-                assignment.update({"date_completed": data[i].find_element(By.TAG_NAME, 'span').text})
+                try:
+                    element = data[i].find_element(By.TAG_NAME, 'span')
+                    assignment.update({"date_completed": element.text})
+                except NoSuchElementException:
+                    assignment.update({"date_completed": None})
 
             elif i == 6:
                 try:

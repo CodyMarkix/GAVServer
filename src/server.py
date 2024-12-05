@@ -11,6 +11,7 @@ from session import Session
 from routes.api.auth import Auth
 from routes.api.user.fullname import FullName
 from routes.api.user.userclass import UserClass
+from routes.api.user.avatar import Avatar
 from routes.api.seminars import Seminars
 from routes.api.programming.sinassign import SingleProgrammingAssignment
 from routes.api.programming.mulassign import MultipleProgrammingAssignments
@@ -33,6 +34,7 @@ class Server(Flask):
         self.api.add_resource(Auth, '/api/auth', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(FullName, '/api/user/fullName', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(UserClass, '/api/user/class', resource_class_kwargs={"session_manager": self.sm})
+        self.api.add_resource(Avatar, '/api/user/avatar', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(Seminars, '/api/seminars', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(MultipleProgrammingAssignments, '/api/programming', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(SingleProgrammingAssignment, '/api/programming/<name>', resource_class_kwargs={"session_manager": self.sm})
