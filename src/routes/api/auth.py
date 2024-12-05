@@ -15,7 +15,7 @@ class Auth(Resource):
             "allowEmptyValue": False,
             "description": "Authenticatee's e-mail",
             "in": "query",
-            "name": "E-mail",
+            "name": "email",
             "required": True,
             "type": "string"
           },
@@ -23,7 +23,7 @@ class Auth(Resource):
             "allowEmptyValue": False,
             "description": "Authenticatee's password",
             "in": "query",
-            "name": "Password",
+            "name": "password",
             "required": True,
             "type": "string"
           }
