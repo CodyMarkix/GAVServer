@@ -135,15 +135,15 @@ class Session:
         time.sleep(self.calculateGoogleDelay(delays[1], delays[2]) + 1.75)
 
         # Going to Google My Account, we're gonna quickly scrape the avatar
-        self.browser.get("https://myaccount.google.com")
-        time.sleep(delays[1] + 2)
+        # self.browser.get("https://myaccount.google.com")
+        # time.sleep(delays[1] + 2)
 
         # God I love web scraping so so much
-        avatar_url = self.browser.find_element(By.CLASS_NAME, 'pGxpHc').find_element(By.TAG_NAME, 'header').find_element(By.CLASS_NAME, 'gb_kd gb_od gb_Fd').find_element(By.CLASS_NAME, 'gb_Bd gb_Zd gb_wd gb_Jd').find_element(By.CLASS_NAME, 'gb_Re').find_element(By.CLASS_NAME, 'gb_y gb_bd gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_C gb_ib gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_A gb_Xa gb_Z').find_element(By.CLASS_NAME, 'gb_O gbii').get_attribute('src')
-        self.avatar = base64.b64encode(self.browser.request('GET', avatar_url).content)
+        # avatar_url = self.browser.find_element(By.CLASS_NAME, 'pGxpHc').find_element(By.TAG_NAME, 'header').find_element(By.CLASS_NAME, 'gb_kd gb_od gb_Fd').find_element(By.CLASS_NAME, 'gb_Bd gb_Zd gb_wd gb_Jd').find_element(By.CLASS_NAME, 'gb_Re').find_element(By.CLASS_NAME, 'gb_y gb_bd gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_C gb_ib gb_Nf gb_Z').find_element(By.CLASS_NAME, 'gb_A gb_Xa gb_Z').find_element(By.CLASS_NAME, 'gb_O gbii').get_attribute('src')
+        # self.avatar = base64.b64encode(self.browser.request('GET', avatar_url).content)
 
         self.browser.get(self.serverURL)
-        time.sleep(0.5)
+        time.sleep(0.25)
     
     def getUserFullName(self) -> list[str]:
         self.browser.get(self.serverURL + "/index.xhtml")
