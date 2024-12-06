@@ -18,7 +18,6 @@ class Main:
             server = Server(configuration)
             sh = Shutdown(server.sm)
             signal.signal(signal.SIGINT, sh.performShutdownSafe)
-            signal.signal(signal.SIGTERM, sh.performShutdownSafe)
 
             st.resumeSavedSessions(server.sm)
             try:
