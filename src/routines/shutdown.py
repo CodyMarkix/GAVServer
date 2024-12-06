@@ -61,9 +61,4 @@ class Shutdown:
 
     def performShutdownSafe(self, signum, frame):
         print("Shutting down...")
-
-        session_list = self.sm.getAllSessions()
-        for entry in session_list:
-            for session in entry.values():
-                browser: Firefox = session.browser
-                browser.quit()
+        sys.exit(0)
