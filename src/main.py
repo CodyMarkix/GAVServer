@@ -17,15 +17,15 @@ class Main:
             configuration = Config(sys.argv[1])
             server = Server(configuration)
             sh = Shutdown(server.sm)
-            signal.signal(signal.SIGINT, sh.performShutdown)
-            signal.signal(signal.SIGTERM, sh.performShutdown)
+            signal.signal(signal.SIGINT, sh.performShutdownSafe)
+            signal.signal(signal.SIGTERM, sh.performShutdownSafe)
 
             st.resumeSavedSessions(server.sm)
             try:
                 if __name__ == "__main__":
                     server.run(port=configuration.getIPPort()[1], host=configuration.getIPPort()[0])
             except KeyboardInterrupt:
-                sh.performShutdown() # try/except works as a fallback
+                sh.performShutdownSafe() # try/except works as a fallback
                 sys.exit(1)
         else:
             print("FATAL: Unhandled exception, bailing out!")

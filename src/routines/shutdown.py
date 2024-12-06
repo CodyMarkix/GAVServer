@@ -3,11 +3,14 @@ import os
 import pickle, json
 from datetime import datetime
 from seleniumrequests import Firefox
+from deprecated import deprecated
+
 
 class Shutdown:
     def __init__(self, sm):
         self.sm = sm
 
+    @deprecated(reason="Saving browser sessions is probably the biggest security hole one could've introduced into this project. Use performShutdownSafe instead.")
     def performShutdown(self, signum, frame):
         print("Shutting down...")
 
@@ -55,3 +58,12 @@ class Shutdown:
                 browser.quit()
 
         sys.exit(0)
+
+    def performShutdownSafe(self, signum, frame):
+        print("Shutting down...")
+
+        session_list = self.sm.getAllSessions()
+        for entry in session_list:
+            for session in entry.values():
+                browser: Firefox = session.browser
+                browser.quit()
