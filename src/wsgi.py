@@ -15,8 +15,8 @@ if st.checkConditions():
     app = Server(configuration)
 
     sh = Shutdown(app.sm)
-    signal.signal(signal.SIGINT, sh.performShutdown)
-    signal.signal(signal.SIGTERM, sh.performShutdown)
+    signal.signal(signal.SIGINT, sh.performShutdownSafe)
+    signal.signal(signal.SIGTERM, sh.performShutdownSafe)
     
     st.resumeSavedSessions(app.sm)
 else:
