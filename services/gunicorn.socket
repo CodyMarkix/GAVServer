@@ -1,3 +1,4 @@
+# Credit to: https://www.geeksforgeeks.org/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx/
 [Unit]
 Description=Gunicorn socket
 
