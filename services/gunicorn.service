@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn WSGI server
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+user=<user>
+group=<group>
+WorkingDirectory=/srv/GAVServer/src
+ExecStart=/srv/GAVServer/.venv/bin/gunicorn \
+    --access-logfile - \
+    --workers 3 \
+    --bind unix:/run/gunicorn.sock \
+    wsgi:app
+
+[Install]
+WantedBy=multi-user.target
