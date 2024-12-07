@@ -1,4 +1,3 @@
-from outcome import Value
 import seleniumrequests as selenreq
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -11,7 +10,8 @@ from selenium.common.exceptions import NoSuchElementException
 import subprocess
 from datetime import datetime, timedelta
 import shutil, time, random, os
-import base64
+import re
+import requests
 
 from config import Config
 
@@ -36,7 +36,7 @@ class Session:
             geckodriver_path = ""
 
         # Initialize Firefox driver
-        self.gecko_service = Service(geckodriver_path, popen_kw={"creation_flags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {})
+        self.gecko_service = Service(geckodriver_path)
 
         self.browser_options = Options()
         self.browser_options.binary_location = config.getFirefoxBinary()
@@ -352,3 +352,37 @@ class Session:
             i += 1
 
         return data
+    
+    def getAllStorage(self) -> list[dict]:
+        delays = self.config.getDelays()
+        self.browser.get(self.serverURL + "/files.xhtml")
+        time.sleep(delays[0])
+
+        list_of_files = []
+        download_table = self.browser.find_element(By.ID, 'download:j_idt28_data')
+        files = download_table.find_elements(By.TAG_NAME, 'tr')
+
+        for file in files:
+            table_rows: list[WebElement] = file.find_elements(By.TAG_NAME, 'td')
+            file_data = {
+                "name": table_rows[1].find_element(By.TAG_NAME, 'span').text,
+                "content_type": table_rows[2].text,
+                "date_uploaded": table_rows[3].text,
+                "file_size": float(table_rows[4].text.split()[0])
+            }
+
+            list_of_files.append(file_data)
+
+        return list_of_files
+
+    # def downloadFiles(self, file_list: list[str], request_body: dict):
+    #     self.browser.get(self.serverURL + "/files.xhtml")
+    #     time.sleep(self.config.getDelays()[0])
+
+    #     download_table = self.browser.find_element(By.ID, 'download:j_idt28_data')
+    #     files = download_table.find_elements(By.TAG_NAME, 'tr')
+
+    #     for file in files:
+    #         cols = file.find_elements(By.TAG_NAME, 'td')
+    #         if cols[1].find_element(By.TAG_NAME, 'span').text in file_list:
+    #             self.browser.request(method='POST', url=self.serverURL + "/files.xhtml", data=request_body)

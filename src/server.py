@@ -11,10 +11,11 @@ from session import Session
 from routes.api.auth import Auth
 from routes.api.user.fullname import FullName
 from routes.api.user.userclass import UserClass
-from routes.api.seminars import Seminars
 from routes.api.programming.sinassign import SingleProgrammingAssignment
 from routes.api.programming.mulassign import MultipleProgrammingAssignments
 from routes.api.programming.totalgrade import TotalGrade
+from routes.api.seminars import Seminars
+from routes.api.storage.allstorage import AllStorage
 
 class Server(Flask):
     def __init__(self, config: Config):
@@ -37,6 +38,7 @@ class Server(Flask):
         self.api.add_resource(MultipleProgrammingAssignments, '/api/programming', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(SingleProgrammingAssignment, '/api/programming/<name>', resource_class_kwargs={"session_manager": self.sm})
         self.api.add_resource(TotalGrade, '/api/programming/totalGrade', resource_class_kwargs={"session_manager": self.sm})
+        self.api.add_resource(AllStorage, '/api/storage', resource_class_kwargs={"session_manager": self.sm})
 
     def beforeRequest(self):
         if request.path == "/api/auth":
