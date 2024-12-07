@@ -14,7 +14,7 @@ class Auth(Resource):
           {
             "allowEmptyValue": False,
             "description": "Authenticatee's e-mail",
-            "in": "query",
+            "in": "header",
             "name": "email",
             "required": True,
             "type": "string"
@@ -22,7 +22,7 @@ class Auth(Resource):
           {
             "allowEmptyValue": False,
             "description": "Authenticatee's password",
-            "in": "query",
+            "in": "header",
             "name": "password",
             "required": True,
             "type": "string"
@@ -40,7 +40,7 @@ class Auth(Resource):
     })
     def post(self):
         if request.method == "POST":
-            args = request.args
+            args = request.headers
             
             for entry in self.sm.getAllSessions():
                 for session in entry.values():
