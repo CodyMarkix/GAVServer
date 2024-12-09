@@ -1,13 +1,5 @@
 ![repository logo](./assets/repologo.svg)
 
-<style>
-    #badges {
-        * {
-            margin-left: 1%;
-            margin-right: 1%;
-        }
-    }
-</style>
 
 <div id="badges">
     <a href="https://gyarab.cz">
