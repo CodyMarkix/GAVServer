@@ -26,7 +26,7 @@ GAV Server je neoficiální API napsaná v Pythonu určena pro jednoduchou inter
 
 ### Do production
 
-- nginx (rád mi někdo řekněte kdo reálně používá Apache v production)
+- nginx (prosím mi někdo řekněte kdo reálně používá Apache v production)
 - váš oblíbený WSGI server! Unit soubory v [/services/](../services/) očekávají [gunicorn](https://pypi.org/project/gunicorn).
 
 ## Instalační proces
