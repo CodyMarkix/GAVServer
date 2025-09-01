@@ -12,7 +12,7 @@
 
 <br>
 
-GAV Server je neoficiální API napsaná v Pythonu určena pro jednoduchou interakci se serverem [Gyarab výuka](https://vyuka.gyarab.cz). Její hlavní využití je pro mobilní aplikaci [GAV Client](https://github.com/CodyMarkix/GAVClient), ale jde využít kdekoliv.
+GAV Server je neoficiální API napsaná v Pythonu určena pro jednoduchou interakci se serverem [Gyarab výuka](https://vyuka.gyarab.cz). 
 
 # Instalace
 
