@@ -1,3 +1,7 @@
+# DO NOT USE THIS NO MORE
+
+It's dumb, not maintained and there is an official API now that is much more stable. See: https://vyuka.gyarab.cz/api/
+
 ![repository logo](./assets/repologo.svg)
 
 
